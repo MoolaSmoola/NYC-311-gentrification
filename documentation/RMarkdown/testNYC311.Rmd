@@ -1,0 +1,70 @@
+---
+title: "Generating BG & Category + SC Variables"
+author: "Benet Ge"
+date: "2023-07-10"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Generating Block Groups From Lat/Lon
+
+We will begin by reading in the data from the STATA file.
+
+```{r libraries, include = FALSE}
+library(sf)
+library(dplyr)
+library(haven)
+library(readr)
+library(data.table)
+```
+```{r read data, cache=TRUE}
+NYC311b2pared <- read_dta('/Users/benetge/Downloads/57/NYC311datafiles/pared data stata compress/NYC311b2paredcompress.dta')
+```
+
+You can also then upload a shapefile for NYC block groups, downloaded from [here.](https://www2.census.gov/geo/tiger/GENZ2018/shp/)
+
+```{r upload shapefile}
+block_groups <- st_read("/Users/benetge/Downloads/57/cb_2018_36_bg_500k/cb_2018_36_bg_500k.shp", quiet = TRUE)
+```
+Then view a sample header of the data to make sure it's uploaded correctly.
+```{r view initial data, cache=TRUE}
+head(NYC311b2pared, n=10)
+```
+
+Next, filter out the calls for which no latitude and longitude were recorded. 
+
+Draw coordinates from the latitude and longitude columns, and then convert them to shapefile objects. 
+
+Retrieve the coordinate reference system from block groups.
+
+Then run a function to assess the amount of time it would take to match these coordinates to block groups.
+```{r generate the lat/lon conversion function}
+latlong_sf <- NYC311b2pared %>%
+  filter(!is.na(latitude), !is.na(longitude)) %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = st_crs(block_groups))
+
+system.time({
+  intersected <- st_intersects(latlong_sf, block_groups)
+})
+
+```
+
+Create new columns that assign the block group that's matched to the coordinate pairs.
+```{r mutate and assign block groups}
+latlong_final <- latlong_sf %>% 
+  mutate(intersection = as.integer(intersected),
+         fips = if_else(is.na(intersection), "",
+                        block_groups$GEOID[intersection]))
+```
+View the results and verify that this has been done correctly.
+```{r verify the results}
+latlong_relevant <- latlong_final[,c(1,46,47)]
+head(latlong_relevant, n=10)
+```
+
+

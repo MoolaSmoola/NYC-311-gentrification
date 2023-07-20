@@ -1,0 +1,97 @@
+---
+title: "jenks_leaflet"
+author: "Benet Ge"
+date: "2023-07-18"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Start by running the required libraries.
+```{r library, results = FALSE, warning = FALSE, message = FALSE}
+library(leaflet)
+library(tigris)
+library(sf)
+library(tidycensus)
+library(tidyverse)
+library(htmltools)
+```
+### Next, read in the .csv containing complaint data for each block group with:
+```{r read table, cache = TRUE}
+NYC311_2012_allcomplaints <- read.csv(file = "/Users/benetge/Downloads/57/NYC311datafiles/leaflet/forlove.csv", sep=";")
+```
+### Convert the block group FIPS code (in the "Data" column) from the class(double) to class(character). This is so that we can merge it with census data, which generates its block groups FIPS codes as characters.
+```{r changing to character}
+NYC311_2012_allcomplaints <- NYC311_2012_allcomplaints %>%
+  mutate(Data = as.character(Data))
+```
+### Using tidycensus, call in the block group data for NYC in 2012. Merge it with the complaint csv we just read in.
+```{r reading table, cache =TRUE, results=FALSE}
+nyc_bgs <- block_groups(state = "NY", 
+                        county = c("New York",
+                                   "Kings",
+                                   "Bronx",
+                                   "Richmond",
+                                   "Queens"),
+                        year = "2012")
+nyc_bgs_joined_all <- nyc_bgs %>%
+  left_join(NYC311_2012_allcomplaints, by = c("GEOID" = "Data"))
+
+```
+
+### The original coordinate reference system (CRS) is NAD83, which we want to convert to WGS84 for parity with the leaflet () map-creating package we're going to use.
+```{r crs inequivalence}
+nyc_bgs_joined_all_wgs2 <- st_transform(nyc_bgs_joined_all, crs = "WGS84")
+
+```
+
+### Now we're going to set up the map-making. Create bins for the palette, which are based off of the Jenks natural breaks optimization. Then select a palette. 
+```{r creating palette bins}
+bins <- c(0,56,164,439,1559)
+pal_bins <- colorBin("YlOrRd", domain = nyc_bgs_joined_all_wgs2$"X0", bins = bins)
+```
+
+### Now create the html for the labels, so that when a mouse hovers over separate block groups they generate a pop-up that's readable in html.
+```{r creating html labels}
+labels_jenks <- sprintf(
+  "<strong>%s</strong><br/>%g calls",
+  nyc_bgs_joined_all_wgs2$GEOID, nyc_bgs_joined_all_wgs2$"X0"
+) %>% lapply(htmltools::HTML)
+
+```
+
+### Generate the map using `leaflet()`!
+
+```{r map generation}
+leaflet() %>%
+  addProviderTiles(providers$Stamen.TonerLite) %>%
+  addPolygons(data = nyc_bgs_joined_all_wgs2,
+              fillColor = pal_bins(nyc_bgs_joined_all_wgs2$"X0"),
+              color = "black",
+              stroke = TRUE,
+              weight = 0.3,
+              smoothFactor = 0,
+              fillOpacity = 0.9,
+              highlightOptions = highlightOptions(
+                weight = 3,
+                color = "#F8C",
+                fillOpacity = 0.7,
+                bringToFront = TRUE),
+              label = labels_jenks,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto")) %>%
+  addLegend(
+    position = "bottomright",
+    colors = c('#FFFFB2', '#FECC5C', '#FD8D3C', '#E31A1C'),
+    values = nyc_bgs_joined_all_wgs2$"X0",
+    labels = c("J1: 0-55", "J2: 56-163", "J3: 164-438", "J4: 439-1559"),
+    title = "# 2012-2014 type 0 complaints NYC"
+  )
+
+```
+

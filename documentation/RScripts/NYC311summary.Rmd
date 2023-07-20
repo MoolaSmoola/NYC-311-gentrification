@@ -1,0 +1,21 @@
+---
+title: "NYC311description"
+author: "Benet Ge"
+date: "2023-07-12"
+output: 
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Selecting categorical variables & ordinal variables
+
+Notes: 
+
+* Location summaries should be performed by: `fips`, `incident zip`, `city`, `bbl`, `borough`, `location`, `community districts`, `police precincts`, convert `createddate` somehow for a bar plot over time
+* Descriptive variables: `locationtype` (because of different housing types), `status` (to see if certain areas are disinvested in terms of responses, or especially taxed), `resolution description` (to see the severity of repsonse), `complaintcategory` & `complaintsocialconflict` (my babies)
+* Maybe include these in a separate summary even though they have been accounted for by `complaintcategory` & `complaintsocialconflict`: `complainttype` & `descriptor`
+* To omit (not exact because these are largely unimportant): agency name, the oblique addresses, landmark, duedate, lat/lon, opendatachanneltype, parkfacility, parkborough (identical to borough), vehicle type, taxi, bridge, geometry

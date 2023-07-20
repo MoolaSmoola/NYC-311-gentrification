@@ -1,0 +1,454 @@
+---
+title: "Analysing U.S. Census Data with R"
+author: "Benet Ge"
+date: "2023-07-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, include=FALSE}
+library(tigris)
+library(tidycensus)
+library(tidyverse)
+library(mapboxapi)
+library(tmap)
+```
+
+
+# ggplot method
+
+```{r cars}
+hennepin_race <- get_decennial(
+  geography = "tract",
+  state = "MN",
+  county = "Hennepin",
+  variables = c(
+    Hispanic = "P2_002N",
+    White = "P2_005N",
+    Black = "P2_006N",
+    Native = "P2_007N",
+    Asian = "P2_008N"
+  ),
+  summary_var = "P2_001N",
+  year = 2020,
+  geometry = TRUE
+) %>%
+  mutate(percent = 100 * (value / summary_value))
+```
+Now trying tmap method.
+```{r}
+
+hennepin_black <- filter(hennepin_race,
+                         variable == "Black")
+tm_shape(hennepin_black) +
+  tm_polygons()
+tm_shape(hennepin_black) +
+  tm_polygons(col = "percent")
+```
+
+
+
+```{r}
+tm_shape(hennepin_black) + # so we are now classing by "quantile"
+  tm_polygons(col = "percent",
+              style = "jenks",
+              n = 5,
+              palette = "Purples",
+              title = "2020 US Census",
+              legend.hist = TRUE) +
+  tm_layout(title = "Percent Black\nby Census tract",
+            frame = FALSE,
+            legend.outside = TRUE,
+            bg.color = "grey70",
+            legend.hist.width = 5,
+            fontfamily = "Verdana")
+```
+
+
+
+Adding reference elements to the map using mapboxapi
+
+
+
+
+
+
+```{r static tiles}
+hennepin_tiles <- get_static_tiles(
+  location = hennepin_black,
+  zoom = 10,
+  style_id = "light-v9",
+  username = "mapbox"
+)
+```
+
+
+
+
+```{r}
+tm_shape(hennepin_tiles) +
+  tm_rgb() +
+  tm_shape(hennepin_black) +
+  tm_polygons(col = "percent",
+              style = "jenks",
+              n = 5,
+              palette = "Purples",
+              title = "2020 US Census",
+              alpha = 0.7) +
+  tm_layout(title = "Percent Black\nby Census tract",
+            legend.outside = TRUE,
+            fontfamily = "Verdana") +
+  tm_scale_bar(position = c("left", "bottom")) +
+  tm_compass(position = c("right", "top")) +
+  tm_credits("(c) Mapbox, OSM    ",
+             bg.color = "white",
+             position = c("RIGHT", "BOTTOM"))
+```
+
+
+
+```{r}
+
+tm_shape(hennepin_tiles) +
+  tm_rgb() +
+  tm_shape(hennepin_black) +
+  tm_polygons(col = "percent",
+              style = "jenks",
+              n = 5,
+              palette = "Purples",
+              title = "2020 US Census",
+              alpha = 0.7) +
+  tm_layout(title = "Percent Black\nby Census tract",
+            legend.outside = TRUE,
+            fontfamily = "Verdana") +
+  tm_scale_bar(position = c("left", "bottom")) +
+  tm_compass(position = c("right", "top")) +
+  tm_credits("(c) Mapbox, OSM    ",
+             bg.color = "white",
+             position = c("RIGHT", "BOTTOM"))
+```
+
+## 6.3.4: Alternative map types with tmap
+Choropleth maps best suited for visualizing: 
+
+* rates
+* percentages
+* statistical values that are normalized for the population of areal units
+
+Not ideal for:
+
+* comparing counts themselves
+
+Because those maps may just reflect the underlying population's size.
+
+
+### 6.3.4.1: Graduated symbols
+`tm_bubbles()` can create a graduated symbol map of the Black population in Hennepin County:
+
+```{r Graduated symbol map}
+tm_shape(hennepin_black) +
+  tm_polygons() +
+  tm_bubbles(size = "value", alpha = 0.5,
+col = "navy",
+             title.size = "Non-Hispanic Black - 2020 US Census") +
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "bottom")
+```
+
+This allows comparisons between circles & not polygons.
+
+### 6.3.4.2: Faceted maps
+
+For comparisons, `tm_facets()` creates a faceted map that identifies unique groups, with facets defined with `by`.
+
+
+```{r Faceted map}
+tm_shape(hennepin_race) +
+  tm_facets(by = "variable", scale.factor = 4) +
+  tm_fill(col = "percent",
+          style = "quantile",
+          n = 6,
+          palette = "Blues",
+          title = "Percent (2020 US Census)",) +
+  tm_layout(bg.color = "grey",
+            legend.position = c(-0.7, 0.15),
+            panel.label.bg.color = "white")
+```
+Drawbacks:
+
+* within-group variation/heterogeneity suppressed
+
+### 6.3.4.3: Dot-density maps
+
+`as_dot_density()` from `tidycensus` helps prepares Census data for dot-density. 
+
+```{r as_dot_density}
+hennepin_dots <- hennepin_race %>%
+  as_dot_density(
+    value = "value",
+    values_per_dot = 100,
+    group = "variable"
+)
+```
+Paying attention above to the options.
+
+`tm_dots()` creates the map.
+
+```{r dot-density map}
+background_tracts <- filter(hennepin_race, variable == "White")
+tm_shape(background_tracts) +
+  tm_polygons(col = "white",
+              border.col = "grey") +
+  tm_shape(hennepin_dots) +
+  tm_dots(col = "variable",
+          palette = "Set1",
+size = 0.005,
+          title = "1 dot = 100 people") +
+  tm_layout(legend.outside = TRUE,
+            title = "Race/ethnicity,\n2020 US Census")
+```
+As a note, a dasymetric dot-density map removes uninhabited polygons and `erase_water()` from `tigris` removes bodies of water.
+
+## 6.4: Cartographic workflows with non-Census data
+When using data that's avialable through Census geography but not through ACS/decennial (as in 311 calls), geometry = TRUE functionality not possible. 
+
+### 6.4.1: National election mapping with tigris shapes
+
+Interlude from [here](https://search.r-project.org/CRAN/refmans/tigris/html/block_groups.html)
+
+```{r testing the interlude, results='hide'}
+benton_bgs <- block_groups("Oregon", "Benton")
+
+
+
+```
+```{r plotting the geometry}
+plot(benton_bgs$geometry)
+```
+
+Okay now practicing this with 311 and forlove (counts) data. *NOTE:* `left_join()` retains all rows from first dataset (likely the tigris, which is all bgs), whereas `inner_join()` drops non-matching rows in the output dataset. Try both every time.
+
+### 6.4.2: Understanding and working with ZCTAs
+```{r zcta data reading}
+irs_data <- read_csv("https://www.irs.gov/pub/irs-soi/18zpallnoagi.csv")
+
+ncol(irs_data)
+```
+`select()` allows you to show only certain variables.
+```{r self-employment percentage}
+self_employment <- irs_data %>%
+  select(ZIPCODE, self_emp = N09400, total = N1)
+```
+
+```{r obtain ZCTAs for near Boston, MA}
+library(mapview)
+library(tigris)
+options(tigris_use_cache = TRUE)
+boston_zctas <- zctas(
+  cb = TRUE,
+  starts_with = c("021", "022", "024"),
+  year = 2018
+)
+```
+
+```{r view Boston ZCTAs}
+mapview(boston_zctas)
+```
+```{r joining IRS dataset with ZCTA shapefiles}
+boston_se_data <- boston_zctas %>%
+  left_join(self_employment, by = c("GEOID10" = "ZIPCODE")) %>%
+  mutate(pct_self_emp = 100 * (self_emp / total)) %>%
+  select(GEOID10, self_emp, pct_self_emp)
+```
+
+```{r actually generating ZCTA IRS map}
+tm_shape(boston_se_data, projection = 26918) +
+  tm_fill(col = "pct_self_emp",
+          palette = "Purples",
+          title = "% self-employed,\n2018 IRS SOI data")
+```
+But if instead we want to visualize where most self-employment is located, instead of a percentage relative to the area, we'd want to use 'self_emp' itself in a bubble diagram:
+```{r IRS bubble ZCTA data}
+tm_shape(boston_se_data) +
+  tm_polygons() +
+  tm_bubbles(size = "self_emp",
+             alpha = 0.5,
+             col = "navy",
+             title.size = "Self-employed filers,\n2018 IRS SOI data")
+```
+
+## 6.5 Interactive mapping
+
+### 6.5.1: Interactive mapping with Leaflet
+`leaflet` package does interactive mapping 
+
+
+
+```{r setting up a leaflet color palette}
+library(leaflet)
+pal <- leaflet::colorNumeric(
+  palette ="magma",
+  domain = nyc_bgs_joined_all_wgs$"0"
+)
+
+```
+
+
+```{r building the leaflet map}
+leaflet() %>%
+  addProviderTiles(providers$Stamen.TonerLite) %>%
+  addPolygons(data = nyc_bgs_joined_all_wgs,
+              color = pal(nyc_bgs_joined_all_wgs$"0"),
+              weight = 0.5,
+              smoothFactor = 0.2,
+              fillOpacity = 0.5,
+              label = nyc_bgs_joined_all_wgs$"0") %>%
+  addLegend(
+    position = "bottomright",
+    pal = pal,
+    values = nyc_bgs_joined_all_wgs$"0",
+    title = "# type 0 complaints NYC all"
+  )
+```
+But we lose in group variation because of outliers. We do this with the function `colorQuantile()` instead of `colorNumeric`. Create a new pal called `pal_q`.
+
+```{r setting up a quantile color palette, include = FALSE}
+library(leaflet)
+pal_q <- leaflet::colorQuantile(
+  palette ="magma",
+  domain = nyc_bgs_joined_all_wgs$"0"
+)
+```
+
+```{r building the leaflet map 2}
+leaflet() %>%
+  addProviderTiles(providers$Stamen.TonerLite) %>%
+  addPolygons(data = nyc_bgs_joined_all_wgs,
+              color = pal_q(nyc_bgs_joined_all_wgs$"0"),
+              weight = 0.5,
+              smoothFactor = 0.2,
+              fillOpacity = 0.5,
+              label = nyc_bgs_joined_all_wgs$"0") %>%
+  addLegend(
+    position = "bottomright",
+    pal = pal_q,
+    values = nyc_bgs_joined_all_wgs$"0",
+    title = "# type 0 complaints NYC all"
+  )
+```
+
+```{r troubleshooting the crs inequivalence, eval = FALSE}
+nyc_bgs_joined_all_wgs <- st_transform(nyc_bgs_joined_all, crs = "WGS84")
+```
+
+This is totally awesome. The thing above is to document a difficulty because the CRS used by the tidycensus c_bgs was NAD83, and `leaflet` wants WGS84. Some things to still adjust, however:
+
+* Notice how it's difficult to identify boundaries between contiguous block groups within the same percentile.
+* In addition to the legend including our percentiles, we want to display what those actual percentiles are.
+
+```{r troubleshooting the boundary issue}
+leaflet() %>%
+  addProviderTiles(providers$Stamen.TonerLite) %>%
+  addPolygons(data = nyc_bgs_joined_all_wgs,
+              color = pal_q(nyc_bgs_joined_all_wgs$"0"),
+              weight = 0.5,
+              smoothFactor = 1.0,
+              fillOpacity = 0.5,
+              label = nyc_bgs_joined_all_wgs$"0") %>%
+  addLegend(
+    position = "bottomright",
+    pal = pal_q,
+    values = nyc_bgs_joined_all_wgs$"0",
+    title = "# type 0 complaints NYC all"
+  )
+```
+That's solved. But what about the quantiles? Find the actual values here:
+```{r quantiles}
+nyc_bgs_2012_quantiles <- quantile(nyc_bgs_joined_all_wgs$"0", na.rm = TRUE)
+print(nyc_bgs_2012_quantiles)
+```
+Then apply that to the leaflet code:
+```{r}
+leaflet() %>%
+  addProviderTiles(providers$Stamen.TonerLite) %>%
+  addPolygons(data = nyc_bgs_joined_all_wgs,
+              fillColor = pal_q(nyc_bgs_joined_all_wgs$"0"),
+              color = "black",
+              stroke = TRUE,
+              weight = 0.3,
+              smoothFactor = 0,
+              fillOpacity = 0.9,
+              label = nyc_bgs_joined_all_wgs$"0") %>%
+  addLegend(
+    position = "bottomright",
+    colors = c('black', 'purple', 'red', 'yellow'),
+    values = nyc_bgs_joined_all_wgs$"0",
+    labels = c("Q1: 0-10", "Q2: 11-26", "Q3: 27-53", "Q4: 54-1559"),
+    title = "# 2012-2014 type 0 complaints NYC"
+  )
+```
+
+Somehow I tried bins with Jenks generated numbers:
+
+```{r setting up Jenks bins}
+install.packages("BAMMtools")
+nyc_bgs_2012_jenks <- BAMMtools::getJenksBreaks(nyc_bgs_joined_all_wgs$"0", 5)
+print(nyc_bgs_2012_jenks)
+
+bins <- c(0,56,164,439,1559)
+pal_bins <- colorBin("YlOrRd", domain = nyc_bgs_joined_all_wgs$"0", bins = bins)
+```
+
+```{r Jenks bins}
+leaflet() %>%
+  addProviderTiles(providers$Stamen.TonerLite) %>%
+  addPolygons(data = nyc_bgs_joined_all_wgs,
+              fillColor = pal_bins(nyc_bgs_joined_all_wgs$"0"),
+              color = "black",
+              stroke = TRUE,
+              weight = 0.3,
+              smoothFactor = 0,
+              fillOpacity = 0.9,
+              label = nyc_bgs_joined_all_wgs$"0") %>%
+  addLegend(
+    position = "bottomright",
+    colors = c('#FFFFB2', '#FECC5C', '#FD8D3C', '#E31A1C'),
+    values = nyc_bgs_joined_all_wgs$"0",
+    labels = c("J1: 0-55", "J2: 56-163", "J3: 164-438", "J4: 439-1559"),
+    title = "# 2012-2014 type 0 complaints NYC"
+  )
+```
+
+```{r Jenks with interactivity}
+leaflet() %>%
+  addProviderTiles(providers$Stamen.TonerLite) %>%
+  addPolygons(data = nyc_bgs_joined_all_wgs,
+              fillColor = pal_bins(nyc_bgs_joined_all_wgs$"0"),
+              color = "black",
+              stroke = TRUE,
+              weight = 0.3,
+              smoothFactor = 0,
+              fillOpacity = 0.9,
+              highlightOptions = highlightOptions(
+                weight = 3,
+                color = "#F8C",
+                fillOpacity = 0.7,
+                bringToFront = TRUE),
+              label = labels_jenks,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto")) %>%
+  addLegend(
+    position = "bottomright",
+    colors = c('#FFFFB2', '#FECC5C', '#FD8D3C', '#E31A1C'),
+    values = nyc_bgs_joined_all_wgs$"0",
+    labels = c("J1: 0-55", "J2: 56-163", "J3: 164-438", "J4: 439-1559"),
+    title = "# 2012-2014 type 0 complaints NYC"
+  )
+```
+
