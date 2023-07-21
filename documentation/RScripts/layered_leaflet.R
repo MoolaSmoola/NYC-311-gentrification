@@ -13,11 +13,11 @@ library(shinydashboard)
 library(readxl)
 library(rgdal)
 library(classInt)
+library(RColorBrewer)
 options(timeout = max(300, getOption("timeout"))) # this was necessary for installing rgdal
 
 
 #### SET UP ####
-
 # read in the complaint categories.
 nyc_b_allcat <- read.csv(
   here("NYC311datafiles", "leaflet", "forlove.csv"),

@@ -40,12 +40,6 @@ View(nyc_b_bgs_joined)
 nyc_b_bgs_joined_wgs <- st_transform(nyc_b_bgs_joined, crs = "WGS84")
 
 # derive Jenks breaks for all 5 categories (sans 2 right now)
-nyc_b_bgs_jenks_0 <- getJenksBreaks(nyc_b_bgs_joined_wgs$"X0", 5)
-nyc_b_bgs_jenks_1 <- getJenksBreaks(nyc_b_bgs_joined_wgs$"X1", 5)
-nyc_b_bgs_jenks_3 <- getJenksBreaks(nyc_b_bgs_joined_wgs$"X3", 5)
-nyc_b_bgs_jenks_4 <- getJenksBreaks(nyc_b_bgs_joined_wgs$"X4", 5)
-nyc_b_bgs_jenks_5 <- getJenksBreaks(nyc_b_bgs_joined_wgs$"X5", 5)
-
 # setting up RColorBrewer and classInt
 
 jenks_0 <- classIntervals(nyc_b_bgs_joined_wgs$"X0", n = 5, style = "jenks")
@@ -63,11 +57,6 @@ cols_code_5 <- findColours(jenks_5, brewer.pal(5,"YlOrRd"))
 
 
 # creating palette bins for all 5 categories
-bins0 <- c(nyc_b_bgs_jenks_0)
-bins1 <- c(nyc_b_bgs_jenks_1)
-bins3 <- c(nyc_b_bgs_jenks_3)
-bins4 <- c(nyc_b_bgs_jenks_4)
-bins5 <- c(nyc_b_bgs_jenks_5)
 pal_bins0 <- colorBin("YlOrRd", domain = jenks_0$brks, bins = jenks_0$brks, pretty = FALSE)
 pal_bins1 <- colorBin("YlOrRd", domain = jenks_1$brks, bins = jenks_1$brks, pretty = FALSE)
 pal_bins3 <- colorBin("YlOrRd", domain = jenks_3$brks, bins = jenks_3$brks, pretty = FALSE)
