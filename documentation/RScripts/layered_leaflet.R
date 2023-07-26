@@ -20,15 +20,13 @@ options(timeout = max(300, getOption("timeout"))) # this was necessary for insta
 #### SET UP ####
 # read in the complaint categories.
 nyc_b_allcat <- read.csv(
-  here("NYC311datafiles", "leaflet", "forlove.csv"),
+  here::here("NYC311datafiles", "leaflet", "forlovea.csv"),
   sep = ";") 
 nyc_b_allcat <- nyc_b_allcat[,-1] # remove the first column, which contains row.names
-View(nyc_b_allcat) # verify that this is true
 
 #change "Data" containing FIPS code from numeric to character.
 nyc_b_allcat <- nyc_b_allcat %>%
   mutate(Data = as.character(Data))
-class(nyc_b_allcat$Data) # verify that this was done correctly
 
 #create nyc bgs call from tidycensus. Join it with the complaint categories.
 nyc_bgs <- block_groups(state = "NY",
