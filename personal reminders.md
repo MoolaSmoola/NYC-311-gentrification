@@ -1,4 +1,4 @@
-![image](https://github.com/MoolaSmoola/NYC-311-gentrification/assets/30411021/8479a155-762a-4a0b-9627-a249ceab9935)# Personal reminders
+# Personal reminders
 
 ## Shiny map
 * separate between 0 & NA calls
