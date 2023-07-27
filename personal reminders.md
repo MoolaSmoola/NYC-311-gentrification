@@ -7,6 +7,7 @@
 ## ACS data
 * Comparison Profile a viable option
 * population estimates should not be taken from ACS 5-year but rather the Census Population Estimates Program (PEP)
+* 2020 nonresponse bias was [adjusted](https://www.census.gov/programs-surveys/acs/technical-documentation/user-notes/2022-03.html) in caclulating ACS 5-years that include 2020
 
 ## log 
 * created repo clone on local git, ~/57/NYC311datafiles/leaflet
