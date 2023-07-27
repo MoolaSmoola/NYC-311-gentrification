@@ -1,4 +1,4 @@
-# Personal reminders
+![image](https://github.com/MoolaSmoola/NYC-311-gentrification/assets/30411021/8479a155-762a-4a0b-9627-a249ceab9935)# Personal reminders
 
 ## Shiny map
 * separate between 0 & NA calls
@@ -10,6 +10,7 @@
 * 2020 nonresponse bias was [adjusted](https://www.census.gov/programs-surveys/acs/technical-documentation/user-notes/2022-03.html) in caclulating ACS 5-years that include 2020
 * ACS 5-year includes estimates for [all population sizes](https://www.census.gov/programs-surveys/acs/guidance/estimates.html)
 * Multi-year estimates [smooth out 1-year impacts like COVID](https://www.census.gov/newsroom/blogs/random-samplings/2022/03/period-estimates-american-community-survey.html), included in time I of our data. Further reading needed.
+* [Difference in number of block groups](https://www.census.gov/programs-surveys/acs/geography-acs/reference-materials.2021.html#list-tab-2123892609) between pre-2020: (220333) & post: (242335) is 22002.
 
 ## log 
 * created repo clone on local git, ~/57/NYC311datafiles/leaflet
