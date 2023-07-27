@@ -11,6 +11,7 @@
 * ACS 5-year includes estimates for [all population sizes](https://www.census.gov/programs-surveys/acs/guidance/estimates.html)
 * Multi-year estimates [smooth out 1-year impacts like COVID](https://www.census.gov/newsroom/blogs/random-samplings/2022/03/period-estimates-american-community-survey.html), included in time I of our data. Further reading needed.
 * [Difference in number of block groups](https://www.census.gov/programs-surveys/acs/geography-acs/reference-materials.2021.html#list-tab-2123892609) between pre-2020: (220333) & post: (242335) is 22002.
+* [Relationship file of 2010 - 2020 changes in block groups](https://www2.census.gov/geo/docs/maps-data/data/rel2020/blkgrp/tab20_blkgrp20_blkgrp10_st36.txt)
 
 ## log 
 * created repo clone on local git, ~/57/NYC311datafiles/leaflet
