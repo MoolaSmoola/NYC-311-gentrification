@@ -15,6 +15,7 @@
 * What ACS 5-year variable to use for percent moved within 5 years: 2010-2014, 2000-2009, 2015 and after?
 * When calculating medians for years of education, certain variables were excluded (GED/somecollegenodegree) & normative judgements were made about how many years certain stages take (bachelor's/associate's/master's degree/professional school degree/doctorate degree). These can be excluded, or alternatively assigned numeric values corresponding to *levels*.
 * Strangely, in the ACS 2017-2021 there are a number of NA values for median. There are none in the 2012-2016.
+* Funnily, there are some block groups with complaints and no land mass. Figure out how that happened.
 
 ## log 
 * created repo clone on local git, ~/57/NYC311datafiles/leaflet
