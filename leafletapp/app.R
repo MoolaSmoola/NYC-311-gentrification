@@ -20,7 +20,7 @@ options(timeout = max(300, getOption("timeout"))) # this was necessary for insta
 #### SET UP ####
 # read in the complaint categories.
 nyc_b_allcat <- read.csv(
-  here::here("leafletapp", "forlovea.csv"),
+  here::here("NYC311datafiles", "leaflet", "forlovea.csv"),
   sep = ";") 
 nyc_b_allcat <- nyc_b_allcat[,-1] # remove the first column, which contains row.names
 
