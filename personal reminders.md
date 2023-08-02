@@ -4,6 +4,9 @@
 * separate between 0 & NA calls
 * add markers for parks/houses of worship/etc.
 
+## Forming measures of gentrification
+* Certain changes should have multiple measures e.g. Discrete difference in median years of education, combined with percent difference
+
 ## ACS data
 * ~~Comparison Profile a viable option~~
 * population estimates should not be taken from ACS 5-year but rather the Census Population Estimates Program (PEP)
