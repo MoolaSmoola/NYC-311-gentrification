@@ -6,6 +6,8 @@
 
 ## Forming measures of gentrification
 * Certain changes should have multiple measures e.g. Discrete difference in median years of education, combined with percent difference
+* Changing strings to numerals results in a transition to 7 total digits
+* Infinity increases in complaints (as expected from the jump from 0 to any amount).
 
 ## ACS data
 * ~~Comparison Profile a viable option~~
