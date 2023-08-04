@@ -7,6 +7,7 @@
 * histograms & summary statistics for variables & clean them up to look nice
 * try different kinds of gentrification metrics.
 * session/save workspace
+* is gentrification necessarily an income change or is it an ethnic composition change? people's complaints are about ethnic
 
 ## Shiny map
 * separate between 0 & NA calls
