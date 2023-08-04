@@ -1,5 +1,13 @@
 # Personal reminders
 
+## Notes from today
+* ethnic composition
+* controls
+* looking at subsets of complaints (maybe to get rid of the infinity problem momentarily by assigning 1s or filtering)
+* histograms & summary statistics for variables & clean them up to look nice
+* try different kinds of gentrification metrics.
+* session/save workspace
+
 ## Shiny map
 * separate between 0 & NA calls
 * add markers for parks/houses of worship/etc.
