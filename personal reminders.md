@@ -1,5 +1,8 @@
 # Personal reminders
 
+## to do
+* For infinity values in the complaint categories, change the pre time wave 2 observations to (1) & just see what happens
+
 ## Notes from today
 * ethnic composition
 * controls
