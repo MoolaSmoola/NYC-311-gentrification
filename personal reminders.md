@@ -2,6 +2,7 @@
 
 ## to do
 * For infinity values in the complaint categories, change the pre time wave 2 observations to (1) & just see what happens
+* As an alternative I should simply apply multiple metrics of gentrification to the same file.
 
 ## Notes from today
 * ethnic composition
