@@ -4,6 +4,7 @@
 * For infinity values in the complaint categories, change the pre time wave 2 observations to (1) & just see what happens
 * As an alternative I should simply apply multiple metrics of gentrification to the same file.
 * verify that the time1and2_mutateddifferences file pre and post- `as.numeric` aligns.
+* Workflow: identify new metric, mutate that column, then run it through the two handy dandy functions & have the automatic regressions!
 
 ## Notes from today
 * ethnic composition
