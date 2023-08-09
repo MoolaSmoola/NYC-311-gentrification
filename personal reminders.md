@@ -5,6 +5,7 @@
 * As an alternative I should simply apply multiple metrics of gentrification to the same file.
 * verify that the time1and2_mutateddifferences file pre and post- `as.numeric` aligns.
 * Workflow: identify new metric, mutate that column, then run it through the two handy dandy functions & have the automatic regressions!
+* a good control to add could be borough.
 
 ## Notes from today
 * ethnic composition
