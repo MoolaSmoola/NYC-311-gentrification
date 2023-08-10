@@ -7,6 +7,11 @@
 * confusing myself: difference beteween IV being factor variable and it being a continuous variable?
 * poisson distribution vs. gaussian
 * rather than concurrent, explore effect of gentrification in w11 on complaints w21-w16
+* c21 = β0 + β1(w16-w11)
+* c21-c16 = ''
+* c17-c19 - c14-16 = ''
+* why might we have the significant poverty ones...... fewer groups. aka more opportunities for crazy outliers
+
 ## Notes from today
 * ethnic composition
 * controls
