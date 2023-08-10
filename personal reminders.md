@@ -2,7 +2,7 @@
 
 ## to do
 * notable: across different metrics of gentrification, for complaint 4 there are significant (p<0.001) results for pct_difference_white 
-* controls
+* controls (for borough maybe)
 * possible(?) to create an index variable based on changes in overall ethnic composition, taking into consideration individual changes
 ## Notes from today
 * ethnic composition
