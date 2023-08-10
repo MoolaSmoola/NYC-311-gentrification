@@ -6,6 +6,7 @@
 * possible(?) to create an index variable based on changes in overall ethnic composition, taking into consideration individual changes
 * confusing myself: difference beteween IV being factor variable and it being a continuous variable?
 * poisson distribution vs. gaussian
+* rather than concurrent, explore effect of gentrification in w11 on complaints w21-w16
 ## Notes from today
 * ethnic composition
 * controls
