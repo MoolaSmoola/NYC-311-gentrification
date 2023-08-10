@@ -1,12 +1,9 @@
 # Personal reminders
 
 ## to do
-* For infinity values in the complaint categories, change the pre time wave 2 observations to (1) & just see what happens
-* As an alternative I should simply apply multiple metrics of gentrification to the same file.
-* verify that the time1and2_mutateddifferences file pre and post- `as.numeric` aligns.
-* Workflow: identify new metric, mutate that column, then run it through the two handy dandy functions & have the automatic regressions!
-* a good control to add could be borough.
-
+* notable: across different metrics of gentrification, for complaint 4 there are significant (p<0.001) results for pct_difference_white 
+* controls
+* possible(?) to create an index variable based on changes in overall ethnic composition, taking into consideration individual changes
 ## Notes from today
 * ethnic composition
 * controls
