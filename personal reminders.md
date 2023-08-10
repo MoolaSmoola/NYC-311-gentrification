@@ -5,6 +5,7 @@
 * controls (for borough maybe)
 * possible(?) to create an index variable based on changes in overall ethnic composition, taking into consideration individual changes
 * confusing myself: difference beteween IV being factor variable and it being a continuous variable?
+* poisson distribution vs. gaussian
 ## Notes from today
 * ethnic composition
 * controls
